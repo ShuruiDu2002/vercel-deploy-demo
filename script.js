@@ -1,43 +1,73 @@
-// Profile Info Save/Load
-window.onload = () => {
-  const savedName = localStorage.getItem("name");
-  const savedDesc = localStorage.getItem("desc");
-  const savedImg = localStorage.getItem("avatar");
+const maxProjects = 3;
 
-  if (savedName || savedDesc || savedImg) {
-    document.getElementById("displayName").textContent = savedName;
-    document.getElementById("displayDesc").textContent = savedDesc;
-    if (savedImg) {
-      document.getElementById("avatar").src = savedImg;
-    }
-    document.getElementById("editMode").style.display = "none";
-    document.getElementById("displayMode").style.display = "block";
-  }
+window.onload = () => {
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  if (profile) renderProfile(profile);
 };
 
 function saveProfile() {
   const name = document.getElementById("nameInput").value;
-  const desc = document.getElementById("descInput").value;
+  const tagline = document.getElementById("taglineInput").value;
+  const about = document.getElementById("aboutInput").value;
+  const github = document.getElementById("githubInput").value;
+  const linkedin = document.getElementById("linkedinInput").value;
+  const email = document.getElementById("emailInput").value;
   const file = document.getElementById("imgInput").files[0];
+  const projects = [];
 
-  if (name) {
-    document.getElementById("displayName").textContent = name;
-    document.getElementById("displayDesc").textContent = desc || "No description.";
-    document.getElementById("editMode").style.display = "none";
-    document.getElementById("displayMode").style.display = "block";
-
-    localStorage.setItem("name", name);
-    localStorage.setItem("desc", desc);
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        document.getElementById("avatar").src = e.target.result;
-        localStorage.setItem("avatar", e.target.result);
-      };
-      reader.readAsDataURL(file);
+  for (let i = 0; i < maxProjects; i++) {
+    const title = document.getElementById(`projTitle${i}`)?.value;
+    const desc = document.getElementById(`projDesc${i}`)?.value;
+    const link = document.getElementById(`projLink${i}`)?.value;
+    if (title || desc || link) {
+      projects.push({ title, desc, link });
     }
   }
+
+  const profile = {
+    name, tagline, about, github, linkedin, email, projects
+  };
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      profile.avatar = e.target.result;
+      localStorage.setItem("profile", JSON.stringify(profile));
+      renderProfile(profile);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    const saved = JSON.parse(localStorage.getItem("profile")) || {};
+    profile.avatar = saved.avatar || "";
+    localStorage.setItem("profile", JSON.stringify(profile));
+    renderProfile(profile);
+  }
+}
+
+function renderProfile(data) {
+  document.getElementById("displayName").textContent = data.name || "";
+  document.getElementById("displayTagline").textContent = data.tagline || "";
+  document.getElementById("displayAbout").textContent = data.about || "";
+  if (data.avatar) {
+    document.getElementById("avatar").src = data.avatar;
+  }
+
+  const linksHTML = [];
+  if (data.github) linksHTML.push(`<a href="${data.github}" target="_blank">GitHub</a>`);
+  if (data.linkedin) linksHTML.push(`<a href="${data.linkedin}" target="_blank">LinkedIn</a>`);
+  if (data.email) linksHTML.push(`<a href="mailto:${data.email}">Email</a>`);
+  document.getElementById("socialLinks").innerHTML = linksHTML.join(" ");
+
+  const projHTML = data.projects.map(p => `
+    <div class="project-card">
+      <a href="${p.link}" target="_blank">${p.title}</a>
+      <p>${p.desc}</p>
+    </div>
+  `).join("");
+  document.getElementById("projectCards").innerHTML = projHTML;
+
+  document.getElementById("editMode").style.display = "none";
+  document.getElementById("displayMode").style.display = "block";
 }
 
 function editProfile() {
@@ -45,115 +75,16 @@ function editProfile() {
   document.getElementById("displayMode").style.display = "none";
 }
 
-// Snake Game Variables
-const canvas = document.getElementById("snakeGame");
-const ctx = canvas.getContext("2d");
-let box = 20;
-let snake = [];
-let food;
-let dx = box;
-let dy = 0;
-let game;
+// Add empty project input set
+function addProject() {
+  const container = document.getElementById("projectInputs");
+  const count = container.children.length / 3;
+  if (count >= maxProjects) return;
 
-function startGame() {
-  snake = [{ x: 200, y: 200 }];
-  dx = box;
-  dy = 0;
-  placeFood();
-  clearInterval(game);
-  game = setInterval(draw, 150); // slower speed
+  const index = count;
+  container.insertAdjacentHTML("beforeend", `
+    <input type="text" id="projTitle${index}" placeholder="Project ${index + 1} Title" />
+    <input type="text" id="projDesc${index}" placeholder="Description" />
+    <input type="text" id="projLink${index}" placeholder="Link (https://...)" />
+  `);
 }
-
-function placeFood() {
-  food = {
-    x: Math.floor(Math.random() * 20) * box,
-    y: Math.floor(Math.random() * 20) * box
-  };
-}
-
-function draw() {
-  ctx.fillStyle = "#e8fbe4";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  for (let s of snake) {
-    ctx.fillStyle = "#519872";
-    ctx.fillRect(s.x, s.y, box, box);
-  }
-
-  ctx.fillStyle = "#32CD32";
-  ctx.fillRect(food.x, food.y, box, box);
-
-  let head = { x: snake[0].x + dx, y: snake[0].y + dy };
-
-  if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || collision(head, snake)) {
-    clearInterval(game);
-    alert("Game over! Score: " + snake.length);
-    return;
-  }
-
-  snake.unshift(head);
-
-  if (head.x === food.x && head.y === food.y) {
-    placeFood();
-  } else {
-    snake.pop();
-  }
-}
-
-function collision(head, array) {
-  return array.some(s => s.x === head.x && s.y === head.y);
-}
-
-document.addEventListener("keydown", e => {
-  if (e.key === "w" && dy === 0) {
-    dx = 0; dy = -box;
-  } else if (e.key === "s" && dy === 0) {
-    dx = 0; dy = box;
-  } else if (e.key === "a" && dx === 0) {
-    dx = -box; dy = 0;
-  } else if (e.key === "d" && dx === 0) {
-    dx = box; dy = 0;
-  }
-});
-
-// Triangle Particle Background
-const bgCanvas = document.getElementById("backgroundCanvas");
-const bgCtx = bgCanvas.getContext("2d");
-let triangles = [];
-
-function resizeCanvas() {
-  bgCanvas.width = window.innerWidth;
-  bgCanvas.height = window.innerHeight;
-}
-window.onresize = resizeCanvas;
-resizeCanvas();
-
-for (let i = 0; i < 40; i++) {
-  triangles.push({
-    x: Math.random() * bgCanvas.width,
-    y: Math.random() * bgCanvas.height,
-    size: Math.random() * 30 + 10,
-    dx: Math.random() - 0.5,
-    dy: Math.random() - 0.5
-  });
-}
-
-function drawBackground() {
-  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-  bgCtx.fillStyle = "rgba(200, 220, 200, 0.3)";
-  triangles.forEach(t => {
-    bgCtx.beginPath();
-    bgCtx.moveTo(t.x, t.y);
-    bgCtx.lineTo(t.x + t.size, t.y);
-    bgCtx.lineTo(t.x + t.size / 2, t.y - t.size);
-    bgCtx.closePath();
-    bgCtx.fill();
-    t.x += t.dx;
-    t.y += t.dy;
-
-    if (t.x < 0 || t.x > bgCanvas.width) t.dx *= -1;
-    if (t.y < 0 || t.y > bgCanvas.height) t.dy *= -1;
-  });
-  requestAnimationFrame(drawBackground);
-}
-drawBackground();
