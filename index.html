@@ -2,85 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>My Cool Personal Page</title>
+  <title>My Personal Page</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>🎉 Welcome to Your Personal Web Page 🎉</h1>
+    <h1>🌿 Welcome to Your Personal Page</h1>
 
-    <div class="form-card">
-      <h2>Customize Your Page</h2>
-      <input type="text" id="nameInput" placeholder="Enter your name" />
-      <input type="text" id="descInput" placeholder="Write a short description" />
+    <!-- Editable Profile Form -->
+    <div id="editMode" class="form-card">
+      <h2>Customize Your Profile</h2>
+      <input type="text" id="nameInput" placeholder="Your name" />
+      <input type="text" id="descInput" placeholder="Short description" />
       <input type="file" id="imgInput" accept="image/*" />
-      <button onclick="updateProfile()">Update Profile</button>
+      <button onclick="saveProfile()">Save</button>
     </div>
 
-    <div class="profile-card" id="profileCard">
-      <img src="" id="avatar" alt="Your Photo" style="display:none;" />
-      <h2 id="displayName">Your Name</h2>
-      <p id="displayDesc">Your description goes here.</p>
+    <!-- Display Mode -->
+    <div id="displayMode" class="profile-card" style="display: none;">
+      <button class="edit-btn" onclick="editProfile()">✏️</button>
+      <img id="avatar" src="" alt="Your photo" />
+      <h2 id="displayName"></h2>
+      <p id="displayDesc"></p>
     </div>
 
     <hr />
 
+    <!-- Game Section -->
     <div class="game-area">
-      <h2>Mini Game: Click the Circle!</h2>
-      <p>Click the glowing circle as many times as you can in 10 seconds!</p>
-      <div id="gameZone">
-        <div id="circle" onclick="clickCircle()"></div>
-      </div>
-      <p>Score: <span id="score">0</span></p>
+      <h2>🎮 Play Snake!</h2>
+      <canvas id="snakeGame" width="400" height="400"></canvas>
+      <p>Use arrow keys to move. Eat the dots 🟢!</p>
       <button onclick="startGame()">Start Game</button>
     </div>
   </div>
 
-  <script>
-    function updateProfile() {
-      const name = document.getElementById("nameInput").value;
-      const desc = document.getElementById("descInput").value;
-      const file = document.getElementById("imgInput").files[0];
-      document.getElementById("displayName").textContent = name || "Your Name";
-      document.getElementById("displayDesc").textContent = desc || "Your description goes here.";
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const avatar = document.getElementById("avatar");
-          avatar.src = e.target.result;
-          avatar.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    let score = 0;
-    let gameRunning = false;
-    let gameTimer;
-
-    function clickCircle() {
-      if (!gameRunning) return;
-      score++;
-      document.getElementById("score").textContent = score;
-      moveCircle();
-    }
-
-    function moveCircle() {
-      const circle = document.getElementById("circle");
-      circle.style.top = Math.random() * 200 + "px";
-      circle.style.left = Math.random() * 300 + "px";
-    }
-
-    function startGame() {
-      score = 0;
-      gameRunning = true;
-      document.getElementById("score").textContent = score;
-      moveCircle();
-      gameTimer = setTimeout(() => {
-        gameRunning = false;
-        alert("Time's up! Your score is: " + score);
-      }, 10000);
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
