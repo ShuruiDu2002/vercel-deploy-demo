@@ -9,29 +9,23 @@ body {
   max-width: 800px;
   margin: 40px auto;
   padding: 20px;
-  background: #ffffff;
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 16px;
   box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
-h1, h2, h3 {
+h1, h2 {
   text-align: center;
-  color: #444;
 }
 
-input[type="text"], input[type="file"], textarea {
+input[type="text"], input[type="file"] {
   display: block;
   margin: 10px auto;
   padding: 10px;
-  width: 90%;
-  max-width: 500px;
   border: 1px solid #ccc;
   border-radius: 6px;
-}
-
-textarea {
-  height: 100px;
-  resize: vertical;
+  width: 80%;
+  max-width: 400px;
 }
 
 button {
@@ -49,15 +43,29 @@ button:hover {
   background: #444;
 }
 
-.card {
+.form-card, .profile-card, .game-area {
   background: #fffaf5;
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 30px;
 }
 
+.profile-card {
+  position: relative;
+  text-align: center;
+}
+
+.edit-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
 .avatar {
-  display: block;
   width: 140px;
   height: 140px;
   border-radius: 50%;
@@ -66,44 +74,24 @@ button:hover {
   border: 3px solid #ddd;
 }
 
-.edit-btn {
-  float: right;
-  font-size: 18px;
-  background: none;
-  border: none;
-  cursor: pointer;
+#gameBoard {
+  width: 320px;
+  height: 320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
 }
 
-.tagline {
-  font-style: italic;
-  color: #777;
-  text-align: center;
-}
-
-.social-links a {
-  display: inline-block;
-  margin: 5px 10px;
-  color: #555;
-  text-decoration: none;
-}
-
-.social-links a:hover {
-  text-decoration: underline;
-}
-
-.projects {
-  margin-top: 20px;
-}
-
-.project-card {
-  border: 1px solid #eee;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 6px;
-}
-
-.project-card a {
+.tile {
+  width: 75px;
+  height: 75px;
+  background: #eee;
   font-weight: bold;
-  text-decoration: none;
+  font-size: 24px;
   color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
 }
