@@ -24,7 +24,15 @@ body {
     width: 100%;
 }
 
-.profile-card input,
+.profile-card input {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
 .profile-card textarea {
     width: 100%;
     margin-bottom: 8px;
@@ -32,6 +40,7 @@ body {
     border-radius: 8px;
     border: 1px solid #ccc;
     box-sizing: border-box;
+    resize: vertical; /* ✅ 只能上下拉伸 */
 }
 
 .profile-card img {
