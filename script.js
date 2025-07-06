@@ -1,168 +1,151 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const gridDisplay = document.querySelector(".grid");
-    const scoreDisplay = document.getElementById("score");
-    const resultDisplay = document.getElementById("result");
-    const startBtn = document.getElementById("startBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    let squares = [];
-    let width = 4;
-    let score = 0;
-    let gameRunning = false;
+let grid, scoreDisplay, message;
+let score = 0;
+let tiles = [];
 
-    function createBoard() {
-        for (let i = 0; i < width * width; i++) {
-            const square = document.createElement("div");
-            square.innerHTML = 0;
-            gridDisplay.appendChild(square);
-            squares.push(square);
-        }
-        updateColors();
-    }
+function init() {
+    grid = document.getElementById("grid");
+    scoreDisplay = document.getElementById("score");
+    message = document.getElementById("message");
+    grid.innerHTML = '';
+    tiles = Array(16).fill(0);
+    score = 0;
+    scoreDisplay.textContent = score;
+    message.textContent = '';
+    addRandomTile();
+    addRandomTile();
+    drawTiles();
+}
 
-    function startGame() {
-        gameRunning = true;
-        squares.forEach(square => square.innerHTML = 0);
-        score = 0;
-        scoreDisplay.innerHTML = score;
-        generate();
-        generate();
-        updateColors();
-    }
-
-    function generate() {
-        let empty = squares.filter(sq => sq.innerHTML == 0);
-        if (empty.length === 0) return;
-        let randomSquare = empty[Math.floor(Math.random() * empty.length)];
-        randomSquare.innerHTML = 2;
-        checkGameOver();
-        updateColors();
-    }
-
-    function move(direction) {
-        if (!gameRunning) return;
-        direction();
-        combine(direction === moveLeft || direction === moveRight ? combineRow : combineCol);
-        direction();
-        generate();
-    }
-
-    function moveRight() {
-        for (let i = 0; i < 16; i += 4) {
-            let row = squares.slice(i, i + 4).map(s => +s.innerHTML).filter(n => n);
-            while (row.length < 4) row.unshift(0);
-            row.forEach((val, idx) => squares[i + idx].innerHTML = val);
-        }
-    }
-
-    function moveLeft() {
-        for (let i = 0; i < 16; i += 4) {
-            let row = squares.slice(i, i + 4).map(s => +s.innerHTML).filter(n => n);
-            while (row.length < 4) row.push(0);
-            row.forEach((val, idx) => squares[i + idx].innerHTML = val);
-        }
-    }
-
-    function moveUp() {
-        for (let i = 0; i < 4; i++) {
-            let col = [0, 1, 2, 3].map(j => +squares[i + j * 4].innerHTML).filter(n => n);
-            while (col.length < 4) col.push(0);
-            col.forEach((val, j) => squares[i + j * 4].innerHTML = val);
-        }
-    }
-
-    function moveDown() {
-        for (let i = 0; i < 4; i++) {
-            let col = [0, 1, 2, 3].map(j => +squares[i + j * 4].innerHTML).filter(n => n);
-            while (col.length < 4) col.unshift(0);
-            col.forEach((val, j) => squares[i + j * 4].innerHTML = val);
-        }
-    }
-
-    function combine(fn) {
-        fn();
-        updateColors();
-    }
-
-    function combineRow() {
-        for (let i = 0; i < 15; i++) {
-            if (i % 4 !== 3 && squares[i].innerHTML === squares[i + 1].innerHTML) {
-                let val = +squares[i].innerHTML * 2;
-                squares[i].innerHTML = val;
-                squares[i + 1].innerHTML = 0;
-                score += val;
-                scoreDisplay.innerHTML = score;
-            }
-        }
-    }
-
-    function combineCol() {
-        for (let i = 0; i < 12; i++) {
-            if (squares[i].innerHTML === squares[i + width].innerHTML) {
-                let val = +squares[i].innerHTML * 2;
-                squares[i].innerHTML = val;
-                squares[i + width].innerHTML = 0;
-                score += val;
-                scoreDisplay.innerHTML = score;
-            }
-        }
-    }
-
-    function updateColors() {
-        const colorMap = {
-            0: "#afa192",
-            2: "#eee4da",
-            4: "#ede0c8",
-            8: "#f2b179",
-            16: "#ffcea4",
-            32: "#e8c064",
-            64: "#ffab6e",
-            128: "#fd9982",
-            256: "#ead79c",
-            512: "#76daff",
-            1024: "#beeaa5",
-            2048: "#d7d4f0"
-        };
-        squares.forEach(square => {
-            square.style.backgroundColor = colorMap[square.innerHTML] || "#afa192";
-        });
-    }
-
-    function checkGameOver() {
-        if ([...squares].every(sq => sq.innerHTML != 0)) {
-            resultDisplay.innerHTML = "Game Over!";
-            gameRunning = false;
-        }
-    }
-
-    document.addEventListener("keydown", e => {
-        if (!gameRunning || document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
-        if (e.key === "ArrowLeft" || e.key === "a") move(moveLeft);
-        if (e.key === "ArrowRight" || e.key === "d") move(moveRight);
-        if (e.key === "ArrowUp" || e.key === "w") move(moveUp);
-        if (e.key === "ArrowDown" || e.key === "s") move(moveDown);
+function drawTiles() {
+    grid.innerHTML = '';
+    tiles.forEach((val, i) => {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.textContent = val !== 0 ? val : '';
+        tile.style.background = val === 0 ? "#cdc1b4" :
+                                val === 2 ? "#eee4da" :
+                                val === 4 ? "#ede0c8" :
+                                val === 8 ? "#f2b179" :
+                                val === 16 ? "#f59563" :
+                                val === 32 ? "#f67c5f" :
+                                val === 64 ? "#f65e3b" :
+                                val === 128 ? "#edcf72" :
+                                val === 256 ? "#edcc61" :
+                                val === 512 ? "#edc850" :
+                                val === 1024 ? "#edc53f" :
+                                val === 2048 ? "#edc22e" : "#3c3a32";
+        tile.style.color = val <= 4 ? "#776e65" : "#f9f6f2";
+        grid.appendChild(tile);
     });
+}
 
-    startBtn.addEventListener("click", startGame);
-    restartBtn.addEventListener("click", startGame);
+function addRandomTile() {
+    let empty = tiles.map((val, i) => val === 0 ? i : -1).filter(i => i !== -1);
+    if (empty.length === 0) return;
+    let idx = empty[Math.floor(Math.random() * empty.length)];
+    tiles[idx] = Math.random() < 0.9 ? 2 : 4;
+}
 
-    // profile edit
-    const editBtn = document.getElementById("editBtn");
-    const editForm = document.getElementById("editForm");
-    const nameInput = document.getElementById("nameInput");
-    const bioInput = document.getElementById("bioInput");
-    const saveBtn = document.getElementById("saveBtn");
+function slide(row) {
+    let arr = row.filter(val => val);
+    for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i] === arr[i + 1]) {
+            arr[i] *= 2;
+            score += arr[i];
+            arr[i + 1] = 0;
+        }
+    }
+    return arr.filter(val => val).concat(Array(4 - arr.filter(val => val).length).fill(0));
+}
 
-    editBtn.addEventListener("click", () => {
-        editForm.classList.toggle("hidden");
-    });
+function move(direction) {
+    let moved = false;
+    let newTiles = [...tiles];
 
-    saveBtn.addEventListener("click", () => {
-        const newName = nameInput.value;
-        const newBio = bioInput.value;
-        if (newName) document.querySelector(".name").innerText = newName;
-        if (newBio) document.querySelector(".bio").innerText = newBio;
-        editForm.classList.add("hidden");
-    });
+    for (let i = 0; i < 4; i++) {
+        let line = [];
+        for (let j = 0; j < 4; j++) {
+            let idx = direction === 'left' ? i * 4 + j :
+                      direction === 'right' ? i * 4 + (3 - j) :
+                      direction === 'up' ? j * 4 + i :
+                      direction === 'down' ? (3 - j) * 4 + i : 0;
+            line.push(tiles[idx]);
+        }
+        let slided = slide(line);
+        for (let j = 0; j < 4; j++) {
+            let idx = direction === 'left' ? i * 4 + j :
+                      direction === 'right' ? i * 4 + (3 - j) :
+                      direction === 'up' ? j * 4 + i :
+                      direction === 'down' ? (3 - j) * 4 + i : 0;
+            if (tiles[idx] !== slided[j]) moved = true;
+            newTiles[idx] = slided[j];
+        }
+    }
 
-    createBoard();
+    if (moved) {
+        tiles = newTiles;
+        addRandomTile();
+        drawTiles();
+        scoreDisplay.textContent = score;
+        if (tiles.includes(2048)) message.textContent = "🎉 You win!";
+        if (!tiles.includes(0) && !canMove()) message.textContent = "💀 Game Over!";
+    }
+}
+
+function canMove() {
+    for (let i = 0; i < 16; i++) {
+        if (i % 4 !== 3 && tiles[i] === tiles[i + 1]) return true;
+        if (i < 12 && tiles[i] === tiles[i + 4]) return true;
+    }
+    return false;
+}
+
+document.addEventListener("keydown", (e) => {
+    if (["ArrowUp", "w", "W"].includes(e.key)) move("up");
+    if (["ArrowDown", "s", "S"].includes(e.key)) move("down");
+    if (["ArrowLeft", "a", "A"].includes(e.key)) move("left");
+    if (["ArrowRight", "d", "D"].includes(e.key)) move("right");
 });
+
+// Profile Card Logic
+const profileForm = document.getElementById("profileForm");
+const profileDisplay = document.getElementById("profileDisplay");
+const displayName = document.getElementById("displayName");
+const displayDesc = document.getElementById("displayDesc");
+const displayImage = document.getElementById("displayImage");
+
+profileForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const desc = document.getElementById("description").value.trim();
+    const imgFile = document.getElementById("imageUpload").files[0];
+    if (name && desc && imgFile) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            displayName.textContent = name;
+            displayDesc.textContent = desc;
+            displayImage.src = reader.result;
+            profileForm.classList.add("hidden");
+            profileDisplay.classList.remove("hidden");
+            localStorage.setItem("profileData", JSON.stringify({ name, desc, img: reader.result }));
+        };
+        reader.readAsDataURL(imgFile);
+    }
+});
+
+function editProfile() {
+    profileForm.classList.remove("hidden");
+    profileDisplay.classList.add("hidden");
+}
+
+const saved = localStorage.getItem("profileData");
+if (saved) {
+    const { name, desc, img } = JSON.parse(saved);
+    displayName.textContent = name;
+    displayDesc.textContent = desc;
+    displayImage.src = img;
+    profileForm.classList.add("hidden");
+    profileDisplay.classList.remove("hidden");
+}
+
+init();
