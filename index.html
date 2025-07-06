@@ -1,35 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>My 2048 Page</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Page + 2048</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="profile-card" id="profileCard">
-    <div id="profileDisplay" class="hidden">
-        <h1 id="displayName"></h1>
-        <p id="displayDesc"></p>
-        <img id="displayImage" src="" alt="" />
-        <button onclick="editProfile()" class="edit-button">✏️ Edit</button>
+  <div class="card-container">
+    <div id="profile-card" class="card">
+      <div id="profile-view" class="view-mode hidden">
+        <img id="profile-picture-display" src="" alt="Profile Picture" />
+        <h2 id="name-display"></h2>
+        <p id="description-display"></p>
+        <button id="edit-button">✏️ Edit</button>
+      </div>
+      <div id="profile-edit" class="edit-mode">
+        <input type="text" id="name-input" placeholder="Enter your name" />
+        <textarea id="description-input" placeholder="Write a short bio..."></textarea>
+        <input type="file" id="image-upload" accept="image/*" />
+        <button id="save-button">Save</button>
+      </div>
     </div>
-    <form id="profileForm">
-        <input type="text" id="name" placeholder="Enter your name" />
-        <textarea id="description" placeholder="Enter a short description"></textarea>
-        <input type="file" id="imageUpload" accept="image/*" />
-        <button type="submit">Save</button>
-    </form>
-</div>
+  </div>
 
-<div class="game-wrapper">
+  <div class="game-container">
     <h2>🎮 Play 2048!</h2>
-    <p>Use WASD or Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
-    <div class="score-box">Score: <span id="score">0</span></div>
-    <div class="grid-container" id="grid"></div>
-    <div id="message"></div>
-    <button onclick="init()" class="restart-button">Restart</button>
-</div>
+    <p>Click "Start" to begin. Use WASD or Arrow keys to move the tiles.</p>
+    <p id="result"></p>
+    <div id="score-display">Score: 0</div>
+    <div class="grid-container">
+      <div id="grid" class="grid"></div>
+    </div>
+    <button id="start-game">Start</button>
+    <button id="restart">Restart</button>
+  </div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

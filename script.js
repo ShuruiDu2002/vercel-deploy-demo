@@ -1,151 +1,156 @@
-let grid, scoreDisplay, message;
+const profileView = document.getElementById("profile-view");
+const profileEdit = document.getElementById("profile-edit");
+const nameInput = document.getElementById("name-input");
+const descriptionInput = document.getElementById("description-input");
+const imageUpload = document.getElementById("image-upload");
+const nameDisplay = document.getElementById("name-display");
+const descriptionDisplay = document.getElementById("description-display");
+const profilePictureDisplay = document.getElementById("profile-picture-display");
+
+function saveProfile() {
+  const name = nameInput.value.trim();
+  const description = descriptionInput.value.trim();
+  const image = imageUpload.files[0];
+
+  if (name) localStorage.setItem("name", name);
+  if (description) localStorage.setItem("description", description);
+
+  if (image) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      localStorage.setItem("image", e.target.result);
+      loadProfile();
+    };
+    reader.readAsDataURL(image);
+  } else {
+    loadProfile();
+  }
+}
+
+function loadProfile() {
+  const name = localStorage.getItem("name");
+  const description = localStorage.getItem("description");
+  const image = localStorage.getItem("image");
+
+  if (name || description || image) {
+    profileEdit.classList.add("hidden");
+    profileView.classList.remove("hidden");
+    nameDisplay.textContent = name || "";
+    descriptionDisplay.textContent = description || "";
+    if (image) profilePictureDisplay.src = image;
+  }
+}
+
+document.getElementById("save-button").addEventListener("click", saveProfile);
+document.getElementById("edit-button").addEventListener("click", () => {
+  profileView.classList.add("hidden");
+  profileEdit.classList.remove("hidden");
+});
+
+window.addEventListener("load", loadProfile);
+
+// 2048 game logic
+let grid = [];
 let score = 0;
-let tiles = [];
+let isGameActive = false;
 
-function init() {
-    grid = document.getElementById("grid");
-    scoreDisplay = document.getElementById("score");
-    message = document.getElementById("message");
-    grid.innerHTML = '';
-    tiles = Array(16).fill(0);
-    score = 0;
-    scoreDisplay.textContent = score;
-    message.textContent = '';
-    addRandomTile();
-    addRandomTile();
-    drawTiles();
+function initGrid() {
+  grid = [];
+  const gridEl = document.getElementById("grid");
+  gridEl.innerHTML = "";
+  for (let i = 0; i < 16; i++) {
+    const tile = document.createElement("div");
+    tile.classList.add("tile");
+    tile.textContent = "";
+    gridEl.appendChild(tile);
+    grid.push(tile);
+  }
+  score = 0;
+  updateScore();
+  addNumber();
+  addNumber();
 }
 
-function drawTiles() {
-    grid.innerHTML = '';
-    tiles.forEach((val, i) => {
-        const tile = document.createElement("div");
-        tile.className = "tile";
-        tile.textContent = val !== 0 ? val : '';
-        tile.style.background = val === 0 ? "#cdc1b4" :
-                                val === 2 ? "#eee4da" :
-                                val === 4 ? "#ede0c8" :
-                                val === 8 ? "#f2b179" :
-                                val === 16 ? "#f59563" :
-                                val === 32 ? "#f67c5f" :
-                                val === 64 ? "#f65e3b" :
-                                val === 128 ? "#edcf72" :
-                                val === 256 ? "#edcc61" :
-                                val === 512 ? "#edc850" :
-                                val === 1024 ? "#edc53f" :
-                                val === 2048 ? "#edc22e" : "#3c3a32";
-        tile.style.color = val <= 4 ? "#776e65" : "#f9f6f2";
-        grid.appendChild(tile);
-    });
-}
-
-function addRandomTile() {
-    let empty = tiles.map((val, i) => val === 0 ? i : -1).filter(i => i !== -1);
-    if (empty.length === 0) return;
-    let idx = empty[Math.floor(Math.random() * empty.length)];
-    tiles[idx] = Math.random() < 0.9 ? 2 : 4;
-}
-
-function slide(row) {
-    let arr = row.filter(val => val);
-    for (let i = 0; i < arr.length - 1; i++) {
-        if (arr[i] === arr[i + 1]) {
-            arr[i] *= 2;
-            score += arr[i];
-            arr[i + 1] = 0;
-        }
-    }
-    return arr.filter(val => val).concat(Array(4 - arr.filter(val => val).length).fill(0));
+function addNumber() {
+  const emptyTiles = grid.filter(tile => !tile.textContent);
+  if (emptyTiles.length === 0) return;
+  const randomTile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+  randomTile.textContent = Math.random() > 0.5 ? "2" : "4";
 }
 
 function move(direction) {
-    let moved = false;
-    let newTiles = [...tiles];
+  if (!isGameActive) return;
 
-    for (let i = 0; i < 4; i++) {
-        let line = [];
-        for (let j = 0; j < 4; j++) {
-            let idx = direction === 'left' ? i * 4 + j :
-                      direction === 'right' ? i * 4 + (3 - j) :
-                      direction === 'up' ? j * 4 + i :
-                      direction === 'down' ? (3 - j) * 4 + i : 0;
-            line.push(tiles[idx]);
-        }
-        let slided = slide(line);
-        for (let j = 0; j < 4; j++) {
-            let idx = direction === 'left' ? i * 4 + j :
-                      direction === 'right' ? i * 4 + (3 - j) :
-                      direction === 'up' ? j * 4 + i :
-                      direction === 'down' ? (3 - j) * 4 + i : 0;
-            if (tiles[idx] !== slided[j]) moved = true;
-            newTiles[idx] = slided[j];
-        }
+  const size = 4;
+  let moved = false;
+
+  const get = (r, c) => grid[r * size + c];
+  const set = (r, c, val) => (grid[r * size + c].textContent = val);
+
+  for (let i = 0; i < size; i++) {
+    let values = [];
+    for (let j = 0; j < size; j++) {
+      let val = direction === "left" || direction === "right"
+        ? get(i, j).textContent
+        : get(j, i).textContent;
+      if (val) values.push(Number(val));
     }
 
-    if (moved) {
-        tiles = newTiles;
-        addRandomTile();
-        drawTiles();
-        scoreDisplay.textContent = score;
-        if (tiles.includes(2048)) message.textContent = "🎉 You win!";
-        if (!tiles.includes(0) && !canMove()) message.textContent = "💀 Game Over!";
+    if (direction === "right" || direction === "down") values.reverse();
+
+    for (let k = 0; k < values.length - 1; k++) {
+      if (values[k] === values[k + 1]) {
+        values[k] *= 2;
+        score += values[k];
+        values.splice(k + 1, 1);
+      }
     }
+
+    while (values.length < size) values.push("");
+
+    if (direction === "right" || direction === "down") values.reverse();
+
+    for (let j = 0; j < size; j++) {
+      let currentVal = direction === "left" || direction === "right"
+        ? get(i, j).textContent
+        : get(j, i).textContent;
+      let newVal = values[j] || "";
+      if (currentVal !== newVal) moved = true;
+      if (direction === "left" || direction === "right") set(i, j, newVal);
+      else set(j, i, newVal);
+    }
+  }
+
+  if (moved) {
+    updateScore();
+    addNumber();
+  }
 }
 
-function canMove() {
-    for (let i = 0; i < 16; i++) {
-        if (i % 4 !== 3 && tiles[i] === tiles[i + 1]) return true;
-        if (i < 12 && tiles[i] === tiles[i + 4]) return true;
-    }
-    return false;
+function updateScore() {
+  document.getElementById("score-display").textContent = "Score: " + score;
 }
 
-document.addEventListener("keydown", (e) => {
-    if (["ArrowUp", "w", "W"].includes(e.key)) move("up");
-    if (["ArrowDown", "s", "S"].includes(e.key)) move("down");
-    if (["ArrowLeft", "a", "A"].includes(e.key)) move("left");
-    if (["ArrowRight", "d", "D"].includes(e.key)) move("right");
+document.addEventListener("keydown", e => {
+  if (!isGameActive || document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
+
+  switch (e.key.toLowerCase()) {
+    case "arrowup":
+    case "w": move("up"); break;
+    case "arrowdown":
+    case "s": move("down"); break;
+    case "arrowleft":
+    case "a": move("left"); break;
+    case "arrowright":
+    case "d": move("right"); break;
+  }
 });
 
-// Profile Card Logic
-const profileForm = document.getElementById("profileForm");
-const profileDisplay = document.getElementById("profileDisplay");
-const displayName = document.getElementById("displayName");
-const displayDesc = document.getElementById("displayDesc");
-const displayImage = document.getElementById("displayImage");
-
-profileForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("name").value.trim();
-    const desc = document.getElementById("description").value.trim();
-    const imgFile = document.getElementById("imageUpload").files[0];
-    if (name && desc && imgFile) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            displayName.textContent = name;
-            displayDesc.textContent = desc;
-            displayImage.src = reader.result;
-            profileForm.classList.add("hidden");
-            profileDisplay.classList.remove("hidden");
-            localStorage.setItem("profileData", JSON.stringify({ name, desc, img: reader.result }));
-        };
-        reader.readAsDataURL(imgFile);
-    }
+document.getElementById("start-game").addEventListener("click", () => {
+  isGameActive = true;
+  initGrid();
 });
 
-function editProfile() {
-    profileForm.classList.remove("hidden");
-    profileDisplay.classList.add("hidden");
-}
-
-const saved = localStorage.getItem("profileData");
-if (saved) {
-    const { name, desc, img } = JSON.parse(saved);
-    displayName.textContent = name;
-    displayDesc.textContent = desc;
-    displayImage.src = img;
-    profileForm.classList.add("hidden");
-    profileDisplay.classList.remove("hidden");
-}
-
-init();
+document.getElementById("restart").addEventListener("click", () => {
+  if (isGameActive) initGrid();
+});
