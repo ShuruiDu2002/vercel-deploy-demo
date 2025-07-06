@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shurui Du's Page + 2048</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <title>2048 & Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="app.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="profile-card" id="profileCard">
-      <img id="profileImage" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/NGC_4414_%28NASA-med%29.jpg/640px-NGC_4414_%28NASA-med%29.jpg" alt="Profile Picture" />
-      <h1 id="profileName">Shurui Du</h1>
-      <p id="profileDescription">This is a short description.</p>
-      <button onclick="editProfile()">✏️ Edit</button>
+<div class="profile-container">
+    <div class="profile-card">
+        <img src="avatar.png" class="avatar" alt="avatar">
+        <h2 class="name">Shurui Du</h2>
+        <p class="bio">123</p>
+        <button id="editBtn">✏️ Edit</button>
+        <div id="editForm" class="edit-form hidden">
+            <input type="text" id="nameInput" placeholder="Enter your name">
+            <textarea id="bioInput" placeholder="Write a short bio..."></textarea>
+            <input type="file" id="avatarInput">
+            <button id="saveBtn">Save</button>
+        </div>
     </div>
-    <div class="edit-form" id="editForm" style="display: none;">
-      <input type="text" id="nameInput" placeholder="Enter your name" />
-      <textarea id="bioInput" placeholder="Write a short bio..."></textarea>
-      <input type="file" id="imageInput" />
-      <button onclick="saveProfile()">Save</button>
-    </div>
+</div>
 
-    <div class="game-container">
-      <h2>🎮 Play 2048!</h2>
-      <p>Use Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
-      <div class="score-container">Score: <span id="score">0</span></div>
-      <div class="grid"></div>
-      <p id="result"></p>
-      <button onclick="startGame()">Start</button>
-      <button onclick="restartGame()">Restart</button>
+<div class="game-container">
+    <h2>🎮 Play 2048!</h2>
+    <p>Use Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
+    <div id="scoreDisplay">Score: <span id="score">0</span></div>
+    <div id="result"></div>
+    <div class="grid"></div>
+    <div class="button-row">
+        <button id="startBtn">Start</button>
+        <button id="restartBtn">Restart</button>
     </div>
-  </div>
-  <script src="script.js"></script>
+</div>
 </body>
 </html>
