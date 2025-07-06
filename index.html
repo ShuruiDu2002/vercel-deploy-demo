@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Personal Page + 2048</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <title>My 2048 Page</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <section class="profile">
-      <form id="profile-form">
-        <h2>Edit Your Info ✏️</h2>
-        <label>Name: <input type="text" id="name" required /></label>
-        <label>Tagline: <input type="text" id="tagline" /></label>
-        <label>About: <textarea id="about"></textarea></label>
-        <label>Upload Profile Pic:
-          <input type="file" id="profile-pic-input" accept="image/*" />
-        </label>
+<div class="profile-card" id="profileCard">
+    <div id="profileDisplay" class="hidden">
+        <h1 id="displayName"></h1>
+        <p id="displayDesc"></p>
+        <img id="displayImage" src="" alt="" />
+        <button onclick="editProfile()" class="edit-button">✏️ Edit</button>
+    </div>
+    <form id="profileForm">
+        <input type="text" id="name" placeholder="Enter your name" />
+        <textarea id="description" placeholder="Enter a short description"></textarea>
+        <input type="file" id="imageUpload" accept="image/*" />
         <button type="submit">Save</button>
-      </form>
+    </form>
+</div>
 
-      <div id="profile-display" style="display: none;">
-        <img id="profile-pic" src="" alt="Profile Picture" />
-        <h2 id="display-name"></h2>
-        <p id="display-tagline"></p>
-        <p id="display-about"></p>
-        <button id="edit-btn">✏️ Edit</button>
-      </div>
-    </section>
+<div class="game-wrapper">
+    <h2>🎮 Play 2048!</h2>
+    <p>Use WASD or Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
+    <div class="score-box">Score: <span id="score">0</span></div>
+    <div class="grid-container" id="grid"></div>
+    <div id="message"></div>
+    <button onclick="init()" class="restart-button">Restart</button>
+</div>
 
-    <section class="game">
-      <h2>🎮 Play 2048!</h2>
-      <p>Use WASD or arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
-      <div id="game-board" class="board"></div>
-      <button id="restart-btn">Restart</button>
-    </section>
-  </div>
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

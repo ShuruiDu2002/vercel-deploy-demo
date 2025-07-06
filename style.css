@@ -1,87 +1,93 @@
 body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f6f1;
-  color: #333;
+    margin: 0;
+    padding: 2em;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #fdfaf5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #333;
 }
 
-.container {
-  max-width: 800px;
-  margin: auto;
-  padding: 2rem;
+.profile-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    margin-bottom: 40px;
 }
 
-section {
-  background: #fffaf3;
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+.profile-card input,
+.profile-card textarea {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
 }
 
-h2 {
-  margin-top: 0;
+.profile-card img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-top: 10px;
 }
 
-label {
-  display: block;
-  margin: 0.5rem 0;
+.hidden {
+    display: none;
 }
 
-input[type="text"],
-textarea {
-  width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.25rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
+.edit-button {
+    background: #eee;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
 }
 
-textarea {
-  resize: vertical;
+.game-wrapper {
+    text-align: center;
+    background: #fffaf0;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-button {
-  background: #5c5c5c;
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  border-radius: 6px;
-  margin-top: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-button:hover {
-  background: #444;
-}
-
-#profile-pic {
-  width: 100px;
-  border-radius: 50%;
-  display: block;
-  margin: 1rem 0;
-}
-
-.board {
-  display: grid;
-  grid-template-columns: repeat(4, 80px);
-  grid-gap: 10px;
-  justify-content: center;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 80px);
+    grid-gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .tile {
-  width: 80px;
-  height: 80px;
-  background: #eee4da;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  font-weight: bold;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eee4da;
+    color: #776e65;
+    border-radius: 6px;
+    transition: transform 0.1s ease;
+}
+
+.score-box {
+    margin-top: 10px;
+}
+
+.restart-button {
+    margin-top: 20px;
+    padding: 8px 14px;
+    background: #8f7a66;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
 }

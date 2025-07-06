@@ -1,165 +1,151 @@
-// ----------- Personal Info Logic ----------- //
-const nameInput = document.getElementById("name");
-const taglineInput = document.getElementById("tagline");
-const aboutInput = document.getElementById("about");
-const profilePicInput = document.getElementById("profile-pic-input");
-const profilePic = document.getElementById("profile-pic");
-const profileForm = document.getElementById("profile-form");
-const profileDisplay = document.getElementById("profile-display");
-const displayName = document.getElementById("display-name");
-const displayTagline = document.getElementById("display-tagline");
-const displayAbout = document.getElementById("display-about");
-const editBtn = document.getElementById("edit-btn");
+let grid, scoreDisplay, message;
+let score = 0;
+let tiles = [];
 
-function loadProfile() {
-  const saved = JSON.parse(localStorage.getItem("profileData"));
-  if (saved) {
-    nameInput.value = saved.name;
-    taglineInput.value = saved.tagline;
-    aboutInput.value = saved.about;
-    if (saved.image) {
-      profilePic.src = saved.image;
-      profilePic.style.display = "block";
-    }
-
-    displayName.textContent = saved.name;
-    displayTagline.textContent = saved.tagline;
-    displayAbout.textContent = saved.about;
-
-    profileForm.style.display = "none";
-    profileDisplay.style.display = "block";
-  }
+function init() {
+    grid = document.getElementById("grid");
+    scoreDisplay = document.getElementById("score");
+    message = document.getElementById("message");
+    grid.innerHTML = '';
+    tiles = Array(16).fill(0);
+    score = 0;
+    scoreDisplay.textContent = score;
+    message.textContent = '';
+    addRandomTile();
+    addRandomTile();
+    drawTiles();
 }
-loadProfile();
 
-profileForm.addEventListener("submit", function (e) {
-  e.preventDefault();
-  const data = {
-    name: nameInput.value,
-    tagline: taglineInput.value,
-    about: aboutInput.value,
-    image: profilePic.src || "",
-  };
-  localStorage.setItem("profileData", JSON.stringify(data));
-  displayName.textContent = data.name;
-  displayTagline.textContent = data.tagline;
-  displayAbout.textContent = data.about;
-  profileForm.style.display = "none";
-  profileDisplay.style.display = "block";
-});
-
-profilePicInput.addEventListener("change", function () {
-  const file = profilePicInput.files[0];
-  const reader = new FileReader();
-  reader.onload = () => {
-    profilePic.src = reader.result;
-    profilePic.style.display = "block";
-  };
-  reader.readAsDataURL(file);
-});
-
-editBtn.addEventListener("click", function () {
-  profileForm.style.display = "block";
-  profileDisplay.style.display = "none";
-});
-
-// ----------- 2048 Game Logic ----------- //
-const gridSize = 4;
-let board = [];
-const gameContainer = document.getElementById("game-board");
-const restartBtn = document.getElementById("restart-btn");
-
-function initGame() {
-  board = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
-  addRandomTile();
-  addRandomTile();
-  drawBoard();
+function drawTiles() {
+    grid.innerHTML = '';
+    tiles.forEach((val, i) => {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.textContent = val !== 0 ? val : '';
+        tile.style.background = val === 0 ? "#cdc1b4" :
+                                val === 2 ? "#eee4da" :
+                                val === 4 ? "#ede0c8" :
+                                val === 8 ? "#f2b179" :
+                                val === 16 ? "#f59563" :
+                                val === 32 ? "#f67c5f" :
+                                val === 64 ? "#f65e3b" :
+                                val === 128 ? "#edcf72" :
+                                val === 256 ? "#edcc61" :
+                                val === 512 ? "#edc850" :
+                                val === 1024 ? "#edc53f" :
+                                val === 2048 ? "#edc22e" : "#3c3a32";
+        tile.style.color = val <= 4 ? "#776e65" : "#f9f6f2";
+        grid.appendChild(tile);
+    });
 }
 
 function addRandomTile() {
-  const empty = [];
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      if (board[r][c] === 0) empty.push([r, c]);
-    }
-  }
-  if (empty.length) {
-    const [r, c] = empty[Math.floor(Math.random() * empty.length)];
-    board[r][c] = Math.random() < 0.9 ? 2 : 4;
-  }
-}
-
-function drawBoard() {
-  gameContainer.innerHTML = "";
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      const tile = document.createElement("div");
-      tile.className = "tile";
-      tile.textContent = board[r][c] || "";
-      gameContainer.appendChild(tile);
-    }
-  }
+    let empty = tiles.map((val, i) => val === 0 ? i : -1).filter(i => i !== -1);
+    if (empty.length === 0) return;
+    let idx = empty[Math.floor(Math.random() * empty.length)];
+    tiles[idx] = Math.random() < 0.9 ? 2 : 4;
 }
 
 function slide(row) {
-  let arr = row.filter(x => x !== 0);
-  for (let i = 0; i < arr.length - 1; i++) {
-    if (arr[i] === arr[i + 1]) {
-      arr[i] *= 2;
-      arr[i + 1] = 0;
+    let arr = row.filter(val => val);
+    for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i] === arr[i + 1]) {
+            arr[i] *= 2;
+            score += arr[i];
+            arr[i + 1] = 0;
+        }
     }
-  }
-  return arr.filter(x => x !== 0).concat(Array(gridSize).fill(0)).slice(0, gridSize);
-}
-
-function rotate(matrix) {
-  return matrix[0].map((_, i) => matrix.map(row => row[i])).reverse();
-}
-
-function flip(matrix) {
-  return matrix.map(row => [...row].reverse());
+    return arr.filter(val => val).concat(Array(4 - arr.filter(val => val).length).fill(0));
 }
 
 function move(direction) {
-  let rotated = board;
+    let moved = false;
+    let newTiles = [...tiles];
 
-  if (direction === "up") {
-    rotated = rotate(board);
-  } else if (direction === "down") {
-    rotated = flip(rotate(board));
-  } else if (direction === "right") {
-    rotated = board.map(row => [...row].reverse());
-  }
+    for (let i = 0; i < 4; i++) {
+        let line = [];
+        for (let j = 0; j < 4; j++) {
+            let idx = direction === 'left' ? i * 4 + j :
+                      direction === 'right' ? i * 4 + (3 - j) :
+                      direction === 'up' ? j * 4 + i :
+                      direction === 'down' ? (3 - j) * 4 + i : 0;
+            line.push(tiles[idx]);
+        }
+        let slided = slide(line);
+        for (let j = 0; j < 4; j++) {
+            let idx = direction === 'left' ? i * 4 + j :
+                      direction === 'right' ? i * 4 + (3 - j) :
+                      direction === 'up' ? j * 4 + i :
+                      direction === 'down' ? (3 - j) * 4 + i : 0;
+            if (tiles[idx] !== slided[j]) moved = true;
+            newTiles[idx] = slided[j];
+        }
+    }
 
-  let changed = false;
-  const newBoard = rotated.map(row => {
-    const newRow = slide(row);
-    if (JSON.stringify(row) !== JSON.stringify(newRow)) changed = true;
-    return newRow;
-  });
+    if (moved) {
+        tiles = newTiles;
+        addRandomTile();
+        drawTiles();
+        scoreDisplay.textContent = score;
+        if (tiles.includes(2048)) message.textContent = "🎉 You win!";
+        if (!tiles.includes(0) && !canMove()) message.textContent = "💀 Game Over!";
+    }
+}
 
-  if (!changed) return;
-
-  if (direction === "up") {
-    board = rotate(newBoard.map(row => row.reverse()));
-  } else if (direction === "down") {
-    board = rotate(newBoard).reverse();
-  } else if (direction === "right") {
-    board = newBoard.map(row => row.reverse());
-  } else {
-    board = newBoard;
-  }
-
-  addRandomTile();
-  drawBoard();
+function canMove() {
+    for (let i = 0; i < 16; i++) {
+        if (i % 4 !== 3 && tiles[i] === tiles[i + 1]) return true;
+        if (i < 12 && tiles[i] === tiles[i + 4]) return true;
+    }
+    return false;
 }
 
 document.addEventListener("keydown", (e) => {
-  if (["ArrowUp", "w", "W"].includes(e.key)) move("up");
-  else if (["ArrowDown", "s", "S"].includes(e.key)) move("down");
-  else if (["ArrowLeft", "a", "A"].includes(e.key)) move("left");
-  else if (["ArrowRight", "d", "D"].includes(e.key)) move("right");
+    if (["ArrowUp", "w", "W"].includes(e.key)) move("up");
+    if (["ArrowDown", "s", "S"].includes(e.key)) move("down");
+    if (["ArrowLeft", "a", "A"].includes(e.key)) move("left");
+    if (["ArrowRight", "d", "D"].includes(e.key)) move("right");
 });
 
-restartBtn.addEventListener("click", initGame);
-initGame();
+// Profile Card Logic
+const profileForm = document.getElementById("profileForm");
+const profileDisplay = document.getElementById("profileDisplay");
+const displayName = document.getElementById("displayName");
+const displayDesc = document.getElementById("displayDesc");
+const displayImage = document.getElementById("displayImage");
+
+profileForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const desc = document.getElementById("description").value.trim();
+    const imgFile = document.getElementById("imageUpload").files[0];
+    if (name && desc && imgFile) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            displayName.textContent = name;
+            displayDesc.textContent = desc;
+            displayImage.src = reader.result;
+            profileForm.classList.add("hidden");
+            profileDisplay.classList.remove("hidden");
+            localStorage.setItem("profileData", JSON.stringify({ name, desc, img: reader.result }));
+        };
+        reader.readAsDataURL(imgFile);
+    }
+});
+
+function editProfile() {
+    profileForm.classList.remove("hidden");
+    profileDisplay.classList.add("hidden");
+}
+
+const saved = localStorage.getItem("profileData");
+if (saved) {
+    const { name, desc, img } = JSON.parse(saved);
+    displayName.textContent = name;
+    displayDesc.textContent = desc;
+    displayImage.src = img;
+    profileForm.classList.add("hidden");
+    profileDisplay.classList.remove("hidden");
+}
+
+init();
