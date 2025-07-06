@@ -6,33 +6,39 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <canvas id="backgroundCanvas"></canvas>
-
   <div class="container">
-    <h1>🌿 Welcome to Your Personal Page</h1>
+    <h1>📝 My Personal Webpage</h1>
 
-    <div id="editMode" class="form-card">
-      <h2>Customize Your Profile</h2>
-      <input type="text" id="nameInput" placeholder="Your name" />
-      <input type="text" id="descInput" placeholder="Short description" />
+    <!-- 编辑模式 -->
+    <div id="editMode" class="card">
+      <h2>Edit Your Info</h2>
+      <input type="text" id="nameInput" placeholder="Your Name" />
+      <input type="text" id="taglineInput" placeholder="Tagline (e.g., Student / Developer)" />
+      <textarea id="aboutInput" placeholder="Write something about yourself..."></textarea>
       <input type="file" id="imgInput" accept="image/*" />
+
+      <h3>Social Links</h3>
+      <input type="text" id="githubInput" placeholder="GitHub URL" />
+      <input type="text" id="linkedinInput" placeholder="LinkedIn URL" />
+      <input type="text" id="emailInput" placeholder="Email (mailto:...)" />
+
+      <h3>Projects</h3>
+      <div id="projectInputs"></div>
+      <button onclick="addProject()">Add Project</button>
+
       <button onclick="saveProfile()">Save</button>
     </div>
 
-    <div id="displayMode" class="profile-card" style="display: none;">
+    <!-- 展示模式 -->
+    <div id="displayMode" class="card" style="display: none;">
       <button class="edit-btn" onclick="editProfile()">✏️</button>
-      <img id="avatar" src="" alt="Your photo" />
+      <img id="avatar" class="avatar" src="" alt="Your Photo" />
       <h2 id="displayName"></h2>
-      <p id="displayDesc"></p>
-    </div>
+      <p id="displayTagline" class="tagline"></p>
+      <p id="displayAbout"></p>
 
-    <hr />
-
-    <div class="game-area">
-      <h2>🎮 Play Snake!</h2>
-      <canvas id="snakeGame" width="400" height="400"></canvas>
-      <p>Use <strong>W A S D</strong> keys to move. Eat the dots 🟢!</p>
-      <button onclick="startGame()">Start Game</button>
+      <div id="socialLinks" class="social-links"></div>
+      <div id="projectCards" class="projects"></div>
     </div>
   </div>
 
