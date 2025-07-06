@@ -70,23 +70,21 @@ const gameContainer = document.getElementById("game-board");
 const restartBtn = document.getElementById("restart-btn");
 
 function initGame() {
-  board = Array.from({ length: gridSize }, () =>
-    Array(gridSize).fill(0)
-  );
+  board = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
   addRandomTile();
   addRandomTile();
   drawBoard();
 }
 
 function addRandomTile() {
-  const emptyCells = [];
+  const empty = [];
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
-      if (board[r][c] === 0) emptyCells.push([r, c]);
+      if (board[r][c] === 0) empty.push([r, c]);
     }
   }
-  if (emptyCells.length > 0) {
-    const [r, c] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  if (empty.length) {
+    const [r, c] = empty[Math.floor(Math.random() * empty.length)];
     board[r][c] = Math.random() < 0.9 ? 2 : 4;
   }
 }
@@ -97,58 +95,57 @@ function drawBoard() {
     for (let c = 0; c < gridSize; c++) {
       const tile = document.createElement("div");
       tile.className = "tile";
-      if (board[r][c] !== 0) {
-        tile.textContent = board[r][c];
-        tile.style.backgroundColor = "#e0e0e0";
-        tile.style.transform = "scale(1.05)";
-        setTimeout(() => (tile.style.transform = "scale(1)"), 100);
-      }
+      tile.textContent = board[r][c] || "";
       gameContainer.appendChild(tile);
     }
   }
 }
 
 function slide(row) {
-  const arr = row.filter((v) => v !== 0);
+  let arr = row.filter(x => x !== 0);
   for (let i = 0; i < arr.length - 1; i++) {
     if (arr[i] === arr[i + 1]) {
       arr[i] *= 2;
       arr[i + 1] = 0;
     }
   }
-  return arr.filter((v) => v !== 0).concat(Array(gridSize).fill(0)).slice(0, gridSize);
+  return arr.filter(x => x !== 0).concat(Array(gridSize).fill(0)).slice(0, gridSize);
 }
 
-function rotateMatrix(matrix) {
-  return matrix[0].map((_, i) => matrix.map((row) => row[i])).reverse();
+function rotate(matrix) {
+  return matrix[0].map((_, i) => matrix.map(row => row[i])).reverse();
+}
+
+function flip(matrix) {
+  return matrix.map(row => [...row].reverse());
 }
 
 function move(direction) {
   let rotated = board;
 
   if (direction === "up") {
-    rotated = rotateMatrix(board);
+    rotated = rotate(board);
   } else if (direction === "down") {
-    rotated = rotateMatrix(board).map((row) => row.reverse());
+    rotated = flip(rotate(board));
   } else if (direction === "right") {
-    rotated = board.map((row) => row.reverse());
+    rotated = board.map(row => [...row].reverse());
   }
 
   let changed = false;
-  const newBoard = rotated.map((row, i) => {
+  const newBoard = rotated.map(row => {
     const newRow = slide(row);
-    if (JSON.stringify(newRow) !== JSON.stringify(row)) changed = true;
+    if (JSON.stringify(row) !== JSON.stringify(newRow)) changed = true;
     return newRow;
   });
 
   if (!changed) return;
 
   if (direction === "up") {
-    board = rotateMatrix(newBoard).map((row) => row.reverse());
+    board = rotate(newBoard.map(row => row.reverse()));
   } else if (direction === "down") {
-    board = rotateMatrix(newBoard.reverse());
+    board = rotate(newBoard).reverse();
   } else if (direction === "right") {
-    board = newBoard.map((row) => row.reverse());
+    board = newBoard.map(row => row.reverse());
   } else {
     board = newBoard;
   }
@@ -164,8 +161,5 @@ document.addEventListener("keydown", (e) => {
   else if (["ArrowRight", "d", "D"].includes(e.key)) move("right");
 });
 
-restartBtn.addEventListener("click", () => {
-  initGame();
-});
-
+restartBtn.addEventListener("click", initGame);
 initGame();
