@@ -1,66 +1,92 @@
-
 body {
-  background-color: #faf8ef;
-  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
+    background-color: #fdf9f3;
+    font-family: "Clear Sans", Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #333;
 }
 
-.container {
-  width: 500px;
-  margin-top: 20px;
+.profile-container, .game-container {
+    background-color: #fef5e7;
+    width: 500px;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .profile-card {
-  background-color: #fdf6e3;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
-.profile-card img {
-  width: 100px;
-  border-radius: 50%;
-  margin-bottom: 10px;
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0 5px;
+}
+
+.bio {
+    word-wrap: break-word;
+    max-width: 100%;
+    text-align: left;
+}
+
+#editBtn {
+    margin-top: 10px;
 }
 
 .edit-form {
-  background-color: #fdf6e3;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+    margin-top: 10px;
+    width: 100%;
 }
 
-.edit-form input, .edit-form textarea {
-  width: 100%;
-  margin-bottom: 10px;
+.edit-form input,
+.edit-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.hidden {
+    display: none;
 }
 
 .grid {
-  display: flex;
-  flex-wrap: wrap;
-  width: 456px;
-  height: 456px;
-  background-color: #BBADA0;
-  border: 7px solid #BBADA0;
-  border-radius: 6px;
-  margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    width: 456px;
+    height: 456px;
+    background-color: #BBADA0;
+    border: 7px solid #BBADA0;
+    border-radius: 6px;
+    margin: 20px auto;
 }
 
 .grid div {
-  width: 100px;
-  height: 100px;
-  margin: 7px;
-  border-radius: 3px;
-  background-color: #eee4da;
-  text-align: center;
-  line-height: 100px;
-  font-size: 40px;
-  font-weight: bold;
+    width: 100px;
+    height: 100px;
+    margin: 7px;
+    border-radius: 3px;
+    background-color: #EEE4DA;
+    color: #776E65;
+    font-weight: bold;
+    text-align: center;
+    font-size: 45px;
+    line-height: 100px;
 }
 
-.score-container {
-  margin: 10px 0;
+.button-row {
+    text-align: center;
+    margin-top: 10px;
 }
