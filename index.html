@@ -6,10 +6,11 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <canvas id="backgroundCanvas"></canvas>
+
   <div class="container">
     <h1>🌿 Welcome to Your Personal Page</h1>
 
-    <!-- Editable Profile Form -->
     <div id="editMode" class="form-card">
       <h2>Customize Your Profile</h2>
       <input type="text" id="nameInput" placeholder="Your name" />
@@ -18,7 +19,6 @@
       <button onclick="saveProfile()">Save</button>
     </div>
 
-    <!-- Display Mode -->
     <div id="displayMode" class="profile-card" style="display: none;">
       <button class="edit-btn" onclick="editProfile()">✏️</button>
       <img id="avatar" src="" alt="Your photo" />
@@ -28,11 +28,10 @@
 
     <hr />
 
-    <!-- Game Section -->
     <div class="game-area">
       <h2>🎮 Play Snake!</h2>
       <canvas id="snakeGame" width="400" height="400"></canvas>
-      <p>Use arrow keys to move. Eat the dots 🟢!</p>
+      <p>Use <strong>W A S D</strong> keys to move. Eat the dots 🟢!</p>
       <button onclick="startGame()">Start Game</button>
     </div>
   </div>
