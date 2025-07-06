@@ -9,7 +9,6 @@
   <div class="container">
     <h1>🌿 My Personal Page</h1>
 
-    <!-- 编辑模式 -->
     <div id="editMode" class="form-card">
       <h2>Customize Your Profile</h2>
       <input type="text" id="nameInput" placeholder="Your Name" />
@@ -18,7 +17,6 @@
       <button onclick="saveProfile()">Save</button>
     </div>
 
-    <!-- 展示模式 -->
     <div id="displayMode" class="profile-card" style="display: none;">
       <button class="edit-btn" onclick="editProfile()">✏️</button>
       <img id="avatar" class="avatar" src="" alt="Avatar" />
@@ -28,10 +26,9 @@
 
     <hr />
 
-    <!-- 游戏区域 -->
     <div class="game-area">
       <h2>🎮 Play 2048!</h2>
-      <p>Use arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
+      <p>Use WASD or Arrow keys to play. Combine tiles to reach 2048!</p>
       <div id="gameBoard"></div>
       <p>Score: <span id="score">0</span></p>
       <button onclick="resetGame()">Restart</button>
