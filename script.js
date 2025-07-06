@@ -1,119 +1,136 @@
 
-let gameStarted = false;
-let grid = document.getElementById("grid");
-let scoreDisplay = document.getElementById("score");
-let resultDisplay = document.getElementById("result");
+let isGameActive = false;
+const gridDisplay = document.querySelector(".grid");
+const scoreDisplay = document.getElementById("score");
+const resultDisplay = document.getElementById("result");
 const width = 4;
 let squares = [];
 let score = 0;
 
-function startGame() {
-  if (grid.children.length > 0) return;
-  gameStarted = true;
-  score = 0;
-  scoreDisplay.textContent = score;
-  grid.innerHTML = '';
+function createBoard() {
+  gridDisplay.innerHTML = "";
   squares = [];
   for (let i = 0; i < width * width; i++) {
     const square = document.createElement("div");
-    square.textContent = '0';
-    grid.appendChild(square);
+    square.innerHTML = 0;
+    gridDisplay.appendChild(square);
     squares.push(square);
   }
-  generate();
-  generate();
 }
 
 function generate() {
-  let emptySquares = squares.filter(s => s.textContent == '0');
+  const emptySquares = squares.filter(sq => sq.innerHTML == 0);
   if (emptySquares.length === 0) return;
-  let rand = emptySquares[Math.floor(Math.random() * emptySquares.length)];
-  rand.textContent = '2';
-  colorTiles();
-}
-
-function colorTiles() {
-  for (let i = 0; i < squares.length; i++) {
-    let val = parseInt(squares[i].textContent);
-    squares[i].style.backgroundColor = {
-      0: "#cdc1b4", 2: "#eee4da", 4: "#ede0c8", 8: "#f2b179",
-      16: "#ffcea4", 32: "#e8c064", 64: "#ffab6e", 128: "#fd9982",
-      256: "#ead79c", 512: "#76daff", 1024: "#beeaa5", 2048: "#d7d4f0"
-    }[val] || "#ccc";
-  }
-}
-
-function moveRow(row, reverse=false) {
-  let nums = row.map(i => parseInt(squares[i].textContent)).filter(n => n !== 0);
-  if (reverse) nums.reverse();
-  for (let i = 0; i < nums.length - 1; i++) {
-    if (nums[i] === nums[i+1]) {
-      nums[i] *= 2;
-      score += nums[i];
-      nums[i+1] = 0;
-    }
-  }
-  nums = nums.filter(n => n !== 0);
-  while (nums.length < width) nums.push(0);
-  if (reverse) nums.reverse();
-  for (let i = 0; i < width; i++) squares[row[i]].textContent = nums[i];
+  const randomSquare = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+  randomSquare.innerHTML = 2;
+  addColours();
 }
 
 function move(dir) {
-  if (!gameStarted || document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
-
-  for (let r = 0; r < width; r++) {
-    let row = [];
-    for (let c = 0; c < width; c++) {
-      let idx = dir === 'left' || dir === 'right' ? r * width + c : c * width + r;
-      row.push(idx);
+  let moved = false;
+  if (dir === "right" || dir === "left") {
+    for (let i = 0; i < 16; i += 4) {
+      let row = squares.slice(i, i + 4).map(sq => parseInt(sq.innerHTML));
+      let filtered = row.filter(n => n !== 0);
+      if (dir === "right") filtered = Array(4 - filtered.length).fill(0).concat(filtered);
+      else filtered = filtered.concat(Array(4 - filtered.length).fill(0));
+      for (let j = 0; j < 3; j++) {
+        if (filtered[j] !== 0 && filtered[j] === filtered[j + 1]) {
+          filtered[j] *= 2;
+          score += filtered[j];
+          filtered[j + 1] = 0;
+        }
+      }
+      filtered = filtered.filter(n => n !== 0);
+      if (dir === "right") filtered = Array(4 - filtered.length).fill(0).concat(filtered);
+      else filtered = filtered.concat(Array(4 - filtered.length).fill(0));
+      for (let j = 0; j < 4; j++) {
+        if (squares[i + j].innerHTML != filtered[j]) moved = true;
+        squares[i + j].innerHTML = filtered[j];
+      }
     }
-    if (dir === 'right' || dir === 'down') row.reverse();
-    moveRow(row, dir === 'right' || dir === 'down');
+  } else {
+    for (let i = 0; i < 4; i++) {
+      let col = [0, 1, 2, 3].map(j => parseInt(squares[i + j * 4].innerHTML));
+      let filtered = col.filter(n => n !== 0);
+      if (dir === "down") filtered = Array(4 - filtered.length).fill(0).concat(filtered);
+      else filtered = filtered.concat(Array(4 - filtered.length).fill(0));
+      for (let j = 0; j < 3; j++) {
+        if (filtered[j] !== 0 && filtered[j] === filtered[j + 1]) {
+          filtered[j] *= 2;
+          score += filtered[j];
+          filtered[j + 1] = 0;
+        }
+      }
+      filtered = filtered.filter(n => n !== 0);
+      if (dir === "down") filtered = Array(4 - filtered.length).fill(0).concat(filtered);
+      else filtered = filtered.concat(Array(4 - filtered.length).fill(0));
+      for (let j = 0; j < 4; j++) {
+        if (squares[i + j * 4].innerHTML != filtered[j]) moved = true;
+        squares[i + j * 4].innerHTML = filtered[j];
+      }
+    }
   }
-  scoreDisplay.textContent = score;
+  if (moved) generate();
+  scoreDisplay.innerHTML = score;
+}
+
+function control(e) {
+  if (!isGameActive || document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
+  if (e.key === "ArrowLeft") move("left");
+  if (e.key === "ArrowRight") move("right");
+  if (e.key === "ArrowUp") move("up");
+  if (e.key === "ArrowDown") move("down");
+}
+
+function addColours() {
+  squares.forEach(sq => {
+    let val = parseInt(sq.innerHTML);
+    const colors = {
+      0: "#afa192", 2: "#eee4da", 4: "#ede0c8", 8: "#f2b179", 16: "#ffcea4", 32: "#e8c064",
+      64: "#ffab6e", 128: "#fd9982", 256: "#ead79c", 512: "#76daff", 1024: "#beeaa5", 2048: "#d7d4f0"
+    };
+    sq.style.backgroundColor = colors[val] || "#ccc";
+  });
+}
+
+function restartGame() {
+  score = 0;
+  scoreDisplay.innerHTML = "0";
+  createBoard();
+  generate();
   generate();
 }
 
-document.addEventListener("keydown", e => {
-  if (!gameStarted) return;
-  let key = e.key.toLowerCase();
-  if ("wasd".includes(key)) e.preventDefault();
-  if (key === "a" || e.key === "ArrowLeft") move("left");
-  if (key === "d" || e.key === "ArrowRight") move("right");
-  if (key === "w" || e.key === "ArrowUp") move("up");
-  if (key === "s" || e.key === "ArrowDown") move("down");
-  colorTiles();
-});
+function startGame() {
+  isGameActive = true;
+  restartGame();
+}
 
-// Profile logic
-function toggleEdit(edit) {
-  document.getElementById("profileEdit").style.display = edit ? "block" : "none";
-  document.getElementById("profileView").style.display = edit ? "none" : "block";
+function editProfile() {
+  document.getElementById("profileCard").style.display = "none";
+  document.getElementById("editForm").style.display = "block";
+  document.getElementById("nameInput").value = document.getElementById("profileName").innerText;
+  document.getElementById("bioInput").value = document.getElementById("profileDescription").innerText;
 }
 
 function saveProfile() {
-  const name = document.getElementById("nameInput").value;
-  const bio = document.getElementById("bioInput").value;
+  document.getElementById("profileName").innerText = document.getElementById("nameInput").value;
+  document.getElementById("profileDescription").innerText = document.getElementById("bioInput").value;
   const file = document.getElementById("imageInput").files[0];
-  localStorage.setItem("name", name);
-  localStorage.setItem("bio", bio);
   if (file) {
     const reader = new FileReader();
     reader.onload = () => {
-      localStorage.setItem("image", reader.result);
-      loadProfile();
+      document.getElementById("profileImage").src = reader.result;
     };
     reader.readAsDataURL(file);
-  } else {
-    loadProfile();
   }
-  toggleEdit(false);
+  document.getElementById("profileCard").style.display = "block";
+  document.getElementById("editForm").style.display = "none";
 }
 
-function loadProfile() {
-  document.getElementById("displayName").textContent = localStorage.getItem("name") || "Your Name";
-  document.getElementById("displayBio").textContent = localStorage.getItem("bio") || "Your short bio goes here.";
-  document.getElementById("profileImage").src = localStorage.getItem("image") || "";
-}
-loadProfile();
+document.addEventListener("DOMContentLoaded", () => {
+  createBoard();
+  addColours();
+  document.addEventListener("keydown", control);
+});

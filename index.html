@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Interactive 2048 + Profile</title>
+  <title>Shurui Du's Page + 2048</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="profile-card">
-    <div class="profile-view" id="profileView">
-      <img id="profileImage" src="" alt="Avatar" />
-      <h2 id="displayName">Your Name</h2>
-      <p id="displayBio">Your short bio goes here.</p>
-      <button onclick="toggleEdit(true)">✏️ Edit</button>
+  <div class="container">
+    <div class="profile-card" id="profileCard">
+      <img id="profileImage" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/NGC_4414_%28NASA-med%29.jpg/640px-NGC_4414_%28NASA-med%29.jpg" alt="Profile Picture" />
+      <h1 id="profileName">Shurui Du</h1>
+      <p id="profileDescription">This is a short description.</p>
+      <button onclick="editProfile()">✏️ Edit</button>
     </div>
-    <div class="profile-edit" id="profileEdit" style="display: none;">
+    <div class="edit-form" id="editForm" style="display: none;">
       <input type="text" id="nameInput" placeholder="Enter your name" />
       <textarea id="bioInput" placeholder="Write a short bio..."></textarea>
-      <input type="file" id="imageInput" accept="image/*" />
+      <input type="file" id="imageInput" />
       <button onclick="saveProfile()">Save</button>
     </div>
-  </div>
 
-  <div class="game-container">
-    <h2>🎮 Play 2048!</h2>
-    <p>Use WASD or Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
-    <p>Score: <span id="score">0</span></p>
-    <div class="grid" id="grid"></div>
-    <p id="result"></p>
-    <button onclick="startGame()" id="startBtn">Start</button>
+    <div class="game-container">
+      <h2>🎮 Play 2048!</h2>
+      <p>Use Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
+      <div class="score-container">Score: <span id="score">0</span></div>
+      <div class="grid"></div>
+      <p id="result"></p>
+      <button onclick="startGame()">Start</button>
+      <button onclick="restartGame()">Restart</button>
+    </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
