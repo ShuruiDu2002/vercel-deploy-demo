@@ -1,70 +1,40 @@
-const maxProjects = 3;
-
+// ---------------------- PROFILE SECTION ----------------------
 window.onload = () => {
-  const profile = JSON.parse(localStorage.getItem("profile"));
-  if (profile) renderProfile(profile);
+  const name = localStorage.getItem("name");
+  const desc = localStorage.getItem("desc");
+  const avatar = localStorage.getItem("avatar");
+
+  if (name || desc || avatar) {
+    document.getElementById("displayName").textContent = name;
+    document.getElementById("displayDesc").textContent = desc;
+    if (avatar) document.getElementById("avatar").src = avatar;
+    document.getElementById("editMode").style.display = "none";
+    document.getElementById("displayMode").style.display = "block";
+  }
+
+  initGame();
 };
 
 function saveProfile() {
   const name = document.getElementById("nameInput").value;
-  const tagline = document.getElementById("taglineInput").value;
-  const about = document.getElementById("aboutInput").value;
-  const github = document.getElementById("githubInput").value;
-  const linkedin = document.getElementById("linkedinInput").value;
-  const email = document.getElementById("emailInput").value;
+  const desc = document.getElementById("descInput").value;
   const file = document.getElementById("imgInput").files[0];
-  const projects = [];
 
-  for (let i = 0; i < maxProjects; i++) {
-    const title = document.getElementById(`projTitle${i}`)?.value;
-    const desc = document.getElementById(`projDesc${i}`)?.value;
-    const link = document.getElementById(`projLink${i}`)?.value;
-    if (title || desc || link) {
-      projects.push({ title, desc, link });
-    }
-  }
+  document.getElementById("displayName").textContent = name;
+  document.getElementById("displayDesc").textContent = desc;
 
-  const profile = {
-    name, tagline, about, github, linkedin, email, projects
-  };
+  localStorage.setItem("name", name);
+  localStorage.setItem("desc", desc);
 
   if (file) {
     const reader = new FileReader();
     reader.onload = function (e) {
-      profile.avatar = e.target.result;
-      localStorage.setItem("profile", JSON.stringify(profile));
-      renderProfile(profile);
+      const avatar = e.target.result;
+      document.getElementById("avatar").src = avatar;
+      localStorage.setItem("avatar", avatar);
     };
     reader.readAsDataURL(file);
-  } else {
-    const saved = JSON.parse(localStorage.getItem("profile")) || {};
-    profile.avatar = saved.avatar || "";
-    localStorage.setItem("profile", JSON.stringify(profile));
-    renderProfile(profile);
   }
-}
-
-function renderProfile(data) {
-  document.getElementById("displayName").textContent = data.name || "";
-  document.getElementById("displayTagline").textContent = data.tagline || "";
-  document.getElementById("displayAbout").textContent = data.about || "";
-  if (data.avatar) {
-    document.getElementById("avatar").src = data.avatar;
-  }
-
-  const linksHTML = [];
-  if (data.github) linksHTML.push(`<a href="${data.github}" target="_blank">GitHub</a>`);
-  if (data.linkedin) linksHTML.push(`<a href="${data.linkedin}" target="_blank">LinkedIn</a>`);
-  if (data.email) linksHTML.push(`<a href="mailto:${data.email}">Email</a>`);
-  document.getElementById("socialLinks").innerHTML = linksHTML.join(" ");
-
-  const projHTML = data.projects.map(p => `
-    <div class="project-card">
-      <a href="${p.link}" target="_blank">${p.title}</a>
-      <p>${p.desc}</p>
-    </div>
-  `).join("");
-  document.getElementById("projectCards").innerHTML = projHTML;
 
   document.getElementById("editMode").style.display = "none";
   document.getElementById("displayMode").style.display = "block";
@@ -75,16 +45,101 @@ function editProfile() {
   document.getElementById("displayMode").style.display = "none";
 }
 
-// Add empty project input set
-function addProject() {
-  const container = document.getElementById("projectInputs");
-  const count = container.children.length / 3;
-  if (count >= maxProjects) return;
+// ---------------------- 2048 GAME SECTION ----------------------
+const boardSize = 4;
+let board = [];
+let score = 0;
 
-  const index = count;
-  container.insertAdjacentHTML("beforeend", `
-    <input type="text" id="projTitle${index}" placeholder="Project ${index + 1} Title" />
-    <input type="text" id="projDesc${index}" placeholder="Description" />
-    <input type="text" id="projLink${index}" placeholder="Link (https://...)" />
-  `);
+function initGame() {
+  board = Array.from({ length: boardSize }, () => Array(boardSize).fill(0));
+  addTile();
+  addTile();
+  drawBoard();
+  score = 0;
+  document.getElementById("score").textContent = score;
+}
+
+function drawBoard() {
+  const boardDiv = document.getElementById("gameBoard");
+  boardDiv.innerHTML = "";
+
+  board.forEach(row => {
+    row.forEach(val => {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.textContent = val || "";
+      boardDiv.appendChild(tile);
+    });
+  });
+}
+
+function addTile() {
+  let empty = [];
+  board.forEach((r, i) =>
+    r.forEach((val, j) => {
+      if (val === 0) empty.push({ i, j });
+    })
+  );
+
+  if (empty.length === 0) return;
+
+  const { i, j } = empty[Math.floor(Math.random() * empty.length)];
+  board[i][j] = Math.random() > 0.1 ? 2 : 4;
+}
+
+function slide(row) {
+  let arr = row.filter(val => val);
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i] === arr[i + 1]) {
+      arr[i] *= 2;
+      score += arr[i];
+      arr[i + 1] = 0;
+    }
+  }
+  return arr.filter(val => val).concat(Array(boardSize).fill(0)).slice(0, boardSize);
+}
+
+function rotateClockwise() {
+  board = board[0].map((_, i) => board.map(r => r[i]).reverse());
+}
+
+function rotateCounterClockwise() {
+  board = board[0].map((_, i) => board.map(r => r[boardSize - 1 - i]));
+}
+
+function moveLeft() {
+  board = board.map(row => slide(row));
+  addTile();
+  drawBoard();
+  document.getElementById("score").textContent = score;
+}
+
+function moveRight() {
+  board = board.map(row => slide(row.reverse()).reverse());
+  addTile();
+  drawBoard();
+  document.getElementById("score").textContent = score;
+}
+
+function moveUp() {
+  rotateCounterClockwise();
+  moveLeft();
+  rotateClockwise();
+}
+
+function moveDown() {
+  rotateClockwise();
+  moveLeft();
+  rotateCounterClockwise();
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") moveLeft();
+  else if (e.key === "ArrowRight") moveRight();
+  else if (e.key === "ArrowUp") moveUp();
+  else if (e.key === "ArrowDown") moveDown();
+});
+
+function resetGame() {
+  initGame();
 }
