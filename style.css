@@ -9,14 +9,18 @@ body {
     color: #333;
 }
 
-.profile-card {
-    background: #fff;
-    border-radius: 16px;
+.profile-wrapper {
+    width: 360px;
+    background: #fffaf0;
     padding: 20px;
-    width: 320px;
-    text-align: center;
-    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    border-radius: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
     margin-bottom: 40px;
+}
+
+.profile-card {
+    text-align: center;
+    width: 100%;
 }
 
 .profile-card input,
@@ -26,6 +30,7 @@ body {
     padding: 8px;
     border-radius: 8px;
     border: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
 .profile-card img {
@@ -33,7 +38,24 @@ body {
     height: 120px;
     object-fit: cover;
     border-radius: 50%;
+    margin: 10px auto;
+    display: block;
+}
+
+#displayName {
     margin-top: 10px;
+    font-size: 1.5em;
+    word-wrap: break-word;
+    text-align: center;
+}
+
+#displayDesc {
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    text-align: left;
 }
 
 .hidden {
@@ -55,6 +77,7 @@ body {
     padding: 20px;
     border-radius: 16px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 360px;
 }
 
 .grid-container {
