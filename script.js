@@ -101,10 +101,13 @@ function canMove() {
 }
 
 document.addEventListener("keydown", (e) => {
-    if (["ArrowUp", "w", "W"].includes(e.key)) move("up");
-    if (["ArrowDown", "s", "S"].includes(e.key)) move("down");
-    if (["ArrowLeft", "a", "A"].includes(e.key)) move("left");
-    if (["ArrowRight", "d", "D"].includes(e.key)) move("right");
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+        e.preventDefault(); // ✅ 阻止页面滚动
+        if (e.key === "ArrowUp") move("up");
+        else if (e.key === "ArrowDown") move("down");
+        else if (e.key === "ArrowLeft") move("left");
+        else if (e.key === "ArrowRight") move("right");
+    }
 });
 
 // Profile Card Logic
