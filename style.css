@@ -10,7 +10,8 @@ body {
 }
 
 .profile-wrapper {
-    width: 500px; /* ← 加宽了 */
+    width: 90%;
+    max-width: 1000px;
     background: #fffaf0;
     padding: 20px;
     border-radius: 16px;
