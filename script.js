@@ -1,156 +1,119 @@
-const profileView = document.getElementById("profile-view");
-const profileEdit = document.getElementById("profile-edit");
-const nameInput = document.getElementById("name-input");
-const descriptionInput = document.getElementById("description-input");
-const imageUpload = document.getElementById("image-upload");
-const nameDisplay = document.getElementById("name-display");
-const descriptionDisplay = document.getElementById("description-display");
-const profilePictureDisplay = document.getElementById("profile-picture-display");
 
-function saveProfile() {
-  const name = nameInput.value.trim();
-  const description = descriptionInput.value.trim();
-  const image = imageUpload.files[0];
-
-  if (name) localStorage.setItem("name", name);
-  if (description) localStorage.setItem("description", description);
-
-  if (image) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      localStorage.setItem("image", e.target.result);
-      loadProfile();
-    };
-    reader.readAsDataURL(image);
-  } else {
-    loadProfile();
-  }
-}
-
-function loadProfile() {
-  const name = localStorage.getItem("name");
-  const description = localStorage.getItem("description");
-  const image = localStorage.getItem("image");
-
-  if (name || description || image) {
-    profileEdit.classList.add("hidden");
-    profileView.classList.remove("hidden");
-    nameDisplay.textContent = name || "";
-    descriptionDisplay.textContent = description || "";
-    if (image) profilePictureDisplay.src = image;
-  }
-}
-
-document.getElementById("save-button").addEventListener("click", saveProfile);
-document.getElementById("edit-button").addEventListener("click", () => {
-  profileView.classList.add("hidden");
-  profileEdit.classList.remove("hidden");
-});
-
-window.addEventListener("load", loadProfile);
-
-// 2048 game logic
-let grid = [];
+let gameStarted = false;
+let grid = document.getElementById("grid");
+let scoreDisplay = document.getElementById("score");
+let resultDisplay = document.getElementById("result");
+const width = 4;
+let squares = [];
 let score = 0;
-let isGameActive = false;
 
-function initGrid() {
-  grid = [];
-  const gridEl = document.getElementById("grid");
-  gridEl.innerHTML = "";
-  for (let i = 0; i < 16; i++) {
-    const tile = document.createElement("div");
-    tile.classList.add("tile");
-    tile.textContent = "";
-    gridEl.appendChild(tile);
-    grid.push(tile);
-  }
+function startGame() {
+  if (grid.children.length > 0) return;
+  gameStarted = true;
   score = 0;
-  updateScore();
-  addNumber();
-  addNumber();
-}
-
-function addNumber() {
-  const emptyTiles = grid.filter(tile => !tile.textContent);
-  if (emptyTiles.length === 0) return;
-  const randomTile = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
-  randomTile.textContent = Math.random() > 0.5 ? "2" : "4";
-}
-
-function move(direction) {
-  if (!isGameActive) return;
-
-  const size = 4;
-  let moved = false;
-
-  const get = (r, c) => grid[r * size + c];
-  const set = (r, c, val) => (grid[r * size + c].textContent = val);
-
-  for (let i = 0; i < size; i++) {
-    let values = [];
-    for (let j = 0; j < size; j++) {
-      let val = direction === "left" || direction === "right"
-        ? get(i, j).textContent
-        : get(j, i).textContent;
-      if (val) values.push(Number(val));
-    }
-
-    if (direction === "right" || direction === "down") values.reverse();
-
-    for (let k = 0; k < values.length - 1; k++) {
-      if (values[k] === values[k + 1]) {
-        values[k] *= 2;
-        score += values[k];
-        values.splice(k + 1, 1);
-      }
-    }
-
-    while (values.length < size) values.push("");
-
-    if (direction === "right" || direction === "down") values.reverse();
-
-    for (let j = 0; j < size; j++) {
-      let currentVal = direction === "left" || direction === "right"
-        ? get(i, j).textContent
-        : get(j, i).textContent;
-      let newVal = values[j] || "";
-      if (currentVal !== newVal) moved = true;
-      if (direction === "left" || direction === "right") set(i, j, newVal);
-      else set(j, i, newVal);
-    }
+  scoreDisplay.textContent = score;
+  grid.innerHTML = '';
+  squares = [];
+  for (let i = 0; i < width * width; i++) {
+    const square = document.createElement("div");
+    square.textContent = '0';
+    grid.appendChild(square);
+    squares.push(square);
   }
+  generate();
+  generate();
+}
 
-  if (moved) {
-    updateScore();
-    addNumber();
+function generate() {
+  let emptySquares = squares.filter(s => s.textContent == '0');
+  if (emptySquares.length === 0) return;
+  let rand = emptySquares[Math.floor(Math.random() * emptySquares.length)];
+  rand.textContent = '2';
+  colorTiles();
+}
+
+function colorTiles() {
+  for (let i = 0; i < squares.length; i++) {
+    let val = parseInt(squares[i].textContent);
+    squares[i].style.backgroundColor = {
+      0: "#cdc1b4", 2: "#eee4da", 4: "#ede0c8", 8: "#f2b179",
+      16: "#ffcea4", 32: "#e8c064", 64: "#ffab6e", 128: "#fd9982",
+      256: "#ead79c", 512: "#76daff", 1024: "#beeaa5", 2048: "#d7d4f0"
+    }[val] || "#ccc";
   }
 }
 
-function updateScore() {
-  document.getElementById("score-display").textContent = "Score: " + score;
+function moveRow(row, reverse=false) {
+  let nums = row.map(i => parseInt(squares[i].textContent)).filter(n => n !== 0);
+  if (reverse) nums.reverse();
+  for (let i = 0; i < nums.length - 1; i++) {
+    if (nums[i] === nums[i+1]) {
+      nums[i] *= 2;
+      score += nums[i];
+      nums[i+1] = 0;
+    }
+  }
+  nums = nums.filter(n => n !== 0);
+  while (nums.length < width) nums.push(0);
+  if (reverse) nums.reverse();
+  for (let i = 0; i < width; i++) squares[row[i]].textContent = nums[i];
+}
+
+function move(dir) {
+  if (!gameStarted || document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
+
+  for (let r = 0; r < width; r++) {
+    let row = [];
+    for (let c = 0; c < width; c++) {
+      let idx = dir === 'left' || dir === 'right' ? r * width + c : c * width + r;
+      row.push(idx);
+    }
+    if (dir === 'right' || dir === 'down') row.reverse();
+    moveRow(row, dir === 'right' || dir === 'down');
+  }
+  scoreDisplay.textContent = score;
+  generate();
 }
 
 document.addEventListener("keydown", e => {
-  if (!isGameActive || document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
+  if (!gameStarted) return;
+  let key = e.key.toLowerCase();
+  if ("wasd".includes(key)) e.preventDefault();
+  if (key === "a" || e.key === "ArrowLeft") move("left");
+  if (key === "d" || e.key === "ArrowRight") move("right");
+  if (key === "w" || e.key === "ArrowUp") move("up");
+  if (key === "s" || e.key === "ArrowDown") move("down");
+  colorTiles();
+});
 
-  switch (e.key.toLowerCase()) {
-    case "arrowup":
-    case "w": move("up"); break;
-    case "arrowdown":
-    case "s": move("down"); break;
-    case "arrowleft":
-    case "a": move("left"); break;
-    case "arrowright":
-    case "d": move("right"); break;
+// Profile logic
+function toggleEdit(edit) {
+  document.getElementById("profileEdit").style.display = edit ? "block" : "none";
+  document.getElementById("profileView").style.display = edit ? "none" : "block";
+}
+
+function saveProfile() {
+  const name = document.getElementById("nameInput").value;
+  const bio = document.getElementById("bioInput").value;
+  const file = document.getElementById("imageInput").files[0];
+  localStorage.setItem("name", name);
+  localStorage.setItem("bio", bio);
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      localStorage.setItem("image", reader.result);
+      loadProfile();
+    };
+    reader.readAsDataURL(file);
+  } else {
+    loadProfile();
   }
-});
+  toggleEdit(false);
+}
 
-document.getElementById("start-game").addEventListener("click", () => {
-  isGameActive = true;
-  initGrid();
-});
-
-document.getElementById("restart").addEventListener("click", () => {
-  if (isGameActive) initGrid();
-});
+function loadProfile() {
+  document.getElementById("displayName").textContent = localStorage.getItem("name") || "Your Name";
+  document.getElementById("displayBio").textContent = localStorage.getItem("bio") || "Your short bio goes here.";
+  document.getElementById("profileImage").src = localStorage.getItem("image") || "";
+}
+loadProfile();
