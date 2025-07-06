@@ -6,24 +6,26 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="profile-card" id="profileCard">
-    <div id="profileDisplay" class="hidden">
-        <h1 id="displayName"></h1>
-        <p id="displayDesc"></p>
-        <img id="displayImage" src="" alt="" />
-        <button onclick="editProfile()" class="edit-button">✏️ Edit</button>
+<div class="profile-wrapper">
+    <div class="profile-card" id="profileCard">
+        <div id="profileDisplay" class="hidden">
+            <img id="displayImage" src="" alt="" />
+            <h1 id="displayName"></h1>
+            <p id="displayDesc"></p>
+            <button onclick="editProfile()" class="edit-button">✏️ Edit</button>
+        </div>
+        <form id="profileForm">
+            <input type="text" id="name" placeholder="Enter your name" />
+            <textarea id="description" placeholder="Enter a short description"></textarea>
+            <input type="file" id="imageUpload" accept="image/*" />
+            <button type="submit">Save</button>
+        </form>
     </div>
-    <form id="profileForm">
-        <input type="text" id="name" placeholder="Enter your name" />
-        <textarea id="description" placeholder="Enter a short description"></textarea>
-        <input type="file" id="imageUpload" accept="image/*" />
-        <button type="submit">Save</button>
-    </form>
 </div>
 
 <div class="game-wrapper">
     <h2>🎮 Play 2048!</h2>
-    <p>Use WASD or Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
+    <p>Use Arrow keys to move the tiles. Combine same numbers to reach 2048!</p>
     <div class="score-box">Score: <span id="score">0</span></div>
     <div class="grid-container" id="grid"></div>
     <div id="message"></div>
