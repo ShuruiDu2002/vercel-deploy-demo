@@ -1,5 +1,6 @@
 let grid, scoreDisplay, message;
 let score = 0;
+let highScore = localStorage.getItem("highScore") || 0;
 let tiles = [];
 
 function init() {
@@ -10,6 +11,7 @@ function init() {
     tiles = Array(16).fill(0);
     score = 0;
     scoreDisplay.textContent = score;
+    document.getElementById("highScore").textContent = highScore;
     message.textContent = '';
     addRandomTile();
     addRandomTile();
@@ -87,6 +89,13 @@ function move(direction) {
         addRandomTile();
         drawTiles();
         scoreDisplay.textContent = score;
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("highScore", highScore);
+            document.getElementById("highScore").textContent = highScore;
+        }
+
         if (tiles.includes(2048)) message.textContent = "🎉 You win!";
         if (!tiles.includes(0) && !canMove()) message.textContent = "💀 Game Over!";
     }
