@@ -32,12 +32,6 @@ This site includes a simple 2048 implementation on a 4x4 grid. Move the tiles us
 
 ---
 
-## Screenshot
-
-![screenshot](./screenshot.png) <!-- Replace with actual screenshot path if available -->
-
----
-
 ## Technologies Used
 
 - HTML
@@ -55,6 +49,6 @@ Original 2048 codebase adapted from [kubowania/2048](https://github.com/kubowani
 
 ---
 
-## ✨ Live Demo
+## Live Demo
 
-👉 Try it now: [your-deployment-link.vercel.app](https://your-deployment-link.vercel.app)
+Try it now: [your-deployment-link.vercel.app](https://vercel-deploy-demo-phi-tawny.vercel.app/)
