@@ -51,4 +51,4 @@ Original 2048 codebase adapted from [kubowania/2048](https://github.com/kubowani
 
 ## Live Demo
 
-Try it now: [your-deployment-link.vercel.app](https://vercel-deploy-demo-phi-tawny.vercel.app/)
+Try it now: [deployment-link.vercel.app](https://vercel-deploy-demo-phi-tawny.vercel.app/)
